@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Calculator</title>
+    <link rel="icon" href="/img/cal.png" type="image/x-icon" />
+    <style>
+      body {
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 80vh;
+      }
+      .calc {
+        background: rgb(123, 162, 182);
+        border: 5px solid;
+        border-color: rgb(68, 68, 147);
+        border-radius: 10px;
+        width: 400px;
+        height: 470px;
+        overflow: hidden;
+      }
+      .calcshow {
+        width: 390px;
+        padding: 26px;
+        color: white;
+        background-color: rgb(123, 162, 182);
+      }
+      .key {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: repeat(5, 1fr);
+        gap: 15px;
+        padding: 17px;
+        position: relative;
+        left: 2px;
+      }
+      button {
+        width: 55px;
+        height: 55px;
+        border: 1px solid;
+        border-radius: 5px;
+        border-color: rgb(176, 175, 175);
+        background-color: rgb(215, 217, 218);
+        color: rgb(64, 118, 184);
+        font-size: 32px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      button:hover {
+        color: rgb(215, 68, 45);
+      }
+      .operator-btn {
+        color: aliceblue;
+        background-color: rgb(138, 151, 151);
+      }
+      .operator-btn:hover {
+        color: rgb(232, 184, 220);
+      }
+      .tb {
+        width: 322px;
+        height: 90px;
+        border: 5px solid;
+        border-color: rgb(107, 105, 105);
+        border-radius: 10px;
+        position: relative;
+        text-align: right;
+        font-size: 50px;
+        font-weight: bolder;
+        left: 5px;
+      }
+      #one {
+        font-size: 22px;
+      }
+      .equal {
+        background-color: rgb(138, 151, 151);
+        color: aliceblue;
+        grid-area: 3 / 5 / 5 / 6;
+        height: 123px;
+      }
+      #red {
+        background-color: rgb(221, 40, 40);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="calc">
+      <div class="calcshow">
+        <table>
+          <tr>
+            <th colspan="3">
+              <input class="tb" id="tb" readonly placeholder="0" />
+            </th>
+          </tr>
+        </table>
+      </div>
+      <div class="key">
+        <button onclick="toDisplay('7')">7</button>
+        <button onclick="toDisplay('8')">8</button>
+        <button onclick="toDisplay('9')">9</button>
+        <button onclick="toggleSign()" class="operator-btn">+/-</button>
+        <button onclick="del()" class="operator-btn" id="one">DEL</button>
+
+        <button type="button" onclick="toDisplay('4')">4</button>
+        <button type="button" onclick="toDisplay('5')">5</button>
+        <button type="button" onclick="toDisplay('6')">6</button>
+        <button type="button" onclick="toDisplay('×')" class="operator-btn">
+          ×
+        </button>
+        <button type="button" onclick="toDisplay('÷')" class="operator-btn">
+          ÷
+        </button>
+        <button type="button" onclick="toDisplay('1')">1</button>
+        <button type="button" onclick="toDisplay('2')">2</button>
+        <button type="button" onclick="toDisplay('3')">3</button>
+        <button type="button" onclick="toDisplay('-')" class="operator-btn">
+          -
+        </button>
+
+        <button
+          type="button"
+          onclick="clearDisplay()"
+          class="operator-btn"
+          id="red"
+        >
+          C
+        </button>
+        <button type="button" onclick="toDisplay('0')">0</button>
+        <button type="button" onclick="toDisplay('.')">.</button>
+        <button type="button" onclick="toDisplay('+')" class="operator-btn">
+          +
+        </button>
+        <button type="button" onclick="calculator()" class="equal">=</button>
+      </div>
+    </div>
+    <script>
+      let result = "";
+      let display = document.getElementById("tb");
+      let check = false;
+      const max = 10;
+      let toantu = ["+", "-", "×", "÷"];
+      function checkfont() {
+        let length = display.value.length;
+        if (length > 10) {
+          display.style.fontSize = "35px";
+        } else {
+          display.style.fontSize = "50px";
+        }
+      }
+      function toDisplay(value) {
+        if (check) {
+          if (toantu.includes(value)) {
+            display.value += value;
+            check = false;
+          } else {
+            display.value = value;
+            check = false;
+          }
+        } else {
+          if (toantu.includes(value)) {
+            display.value += value;
+            check = false;
+          } else {
+            const tach = display.value.split(/([+\-×÷])/);
+            const sautach = tach[tach.length - 1];
+            if (sautach.replace(/[+\-×÷]/g, "").length < max) {
+              display.value += value;
+            } else if (check) {
+              display.value = value;
+              check = false;
+            }
+          }
+        }
+        check = false;
+        checkfont();
+      }
+
+      function del() {
+        display.value = display.value.slice(0, -1);
+        check = false;
+      }
+      function clearDisplay() {
+        display.value = "";
+        check = false;
+      }
+      function toggleSign() {
+        let value = display.value.trim();
+
+        if (value !== "") {
+          // Tìm số cuối cùng trong biểu thức
+          let lastNumberMatch = value.match(/-?\d+(\.\d+)?$/);
+
+          if (lastNumberMatch) {
+            let lastNumber = lastNumberMatch[0];
+            let toggledNumber;
+
+            // Kiểm tra nếu chỉ có một phần tử (một số duy nhất)
+            if (value === lastNumber) {
+              // Chuyển đổi dấu của số duy nhất
+              if (lastNumber.startsWith("-")) {
+                toggledNumber = lastNumber.slice(1);
+              } else {
+                toggledNumber = `(-${lastNumber})`;
+              }
+            } else {
+              // Chuyển đổi dấu của số cuối cùng và đặt trong ngoặc đơn
+              if (lastNumber.startsWith("-")) {
+                toggledNumber = "-" + `(${lastNumber})`;
+              } else {
+                toggledNumber = `(-${lastNumber})`;
+              }
+            }
+
+            // Cập nhật biểu thức với số cuối cùng đã được chuyển đổi dấu
+            value = value.slice(0, -lastNumber.length) + toggledNumber;
+
+            // Cập nhật phần tử hiển thị với biểu thức mới
+            display.value = value;
+          }
+        }
+        checkfont();
+      }
+      function nhanchia() {
+        const tach = display.value.split(/([+\-×÷])/);
+        let resultArray = [];
+        let temp = BigInt(tach[0]);
+
+        for (let i = 1; i < tach.length; i += 2) {
+          const operator = tach[i];
+          const nextNumber = BigInt(tach[i + 1]);
+          if (operator === "×") {
+            temp *= nextNumber;
+          } else if (operator === "÷") {
+            temp /= nextNumber;
+          } else {
+            resultArray.push(temp);
+            resultArray.push(operator);
+            temp = nextNumber;
+          }
+        }
+        resultArray.push(temp); // Push the last number
+        return resultArray;
+      }
+
+      function congtru(tinhtruoc) {
+        let kq = BigInt(tinhtruoc[0]);
+
+        for (let i = 1; i < tinhtruoc.length; i += 2) {
+          const operator = tinhtruoc[i];
+          const nextNumber = BigInt(tinhtruoc[i + 1]);
+
+          if (operator === "+") {
+            kq += nextNumber;
+          } else if (operator === "-") {
+            kq -= nextNumber;
+          }
+        }
+        return kq.toString();
+      }
+
+      function calculator() {
+        if (display.value === "") {
+          return;
+        }
+        let bieuthuc = display.value;
+        if (bieuthuc.startsWith("-")) {
+          bieuthuc = "0" + bieuthuc;
+        }
+        const tinhtruoc = nhanchia();
+        const kqcuoi = congtru(tinhtruoc);
+        display.value = kqcuoi;
+        console.log(kqcuoi);
+        checkfont();
+        check = true;
+      }
+    </script>
+  </body>
+</html>
